@@ -28,4 +28,38 @@ int count_read_calls(void *ctx) {
     __sync_fetch_and_add(value, 1);
 }
 
+SEC("tracepoint/syscalls/sys_enter_write")
+int count_write_calls(void *ctx) {
+    __u32 key = 1;
+    __u64 *value, zero = 0;
+
+    // Look up the current count in the map.
+    value = bpf_map_lookup_elem(&syscall_count_map, &key);
+    if (!value) {
+        // Initialize the counter if it doesn't exist.
+        bpf_map_update_elem(&syscall_count_map, &key, &zero, BPF_ANY);
+        value = &zero;
+    }
+    
+    // Increment the syscall count atomically.
+    __sync_fetch_and_add(value, 1);
+}
+
+SEC("tracepoint/syscalls/sys_enter_open")
+int count_open_calls(void *ctx) {
+    __u32 key = 2;
+    __u64 *value, zero = 0;
+
+    // Look up the current count in the map.
+    value = bpf_map_lookup_elem(&syscall_count_map, &key);
+    if (!value) {
+        // Initialize the counter if it doesn't exist.
+        bpf_map_update_elem(&syscall_count_map, &key, &zero, BPF_ANY);
+        value = &zero;
+    }
+    
+    // Increment the syscall count atomically.
+    __sync_fetch_and_add(value, 1);
+}
+
 char _license[] SEC("license") = "GPL";

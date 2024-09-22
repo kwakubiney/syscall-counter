@@ -53,7 +53,9 @@ type counterSpecs struct {
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type counterProgramSpecs struct {
-	CountReadCalls *ebpf.ProgramSpec `ebpf:"count_read_calls"`
+	CountOpenCalls  *ebpf.ProgramSpec `ebpf:"count_open_calls"`
+	CountReadCalls  *ebpf.ProgramSpec `ebpf:"count_read_calls"`
+	CountWriteCalls *ebpf.ProgramSpec `ebpf:"count_write_calls"`
 }
 
 // counterMapSpecs contains maps before they are loaded into the kernel.
@@ -95,12 +97,16 @@ func (m *counterMaps) Close() error {
 //
 // It can be passed to loadCounterObjects or ebpf.CollectionSpec.LoadAndAssign.
 type counterPrograms struct {
-	CountReadCalls *ebpf.Program `ebpf:"count_read_calls"`
+	CountOpenCalls  *ebpf.Program `ebpf:"count_open_calls"`
+	CountReadCalls  *ebpf.Program `ebpf:"count_read_calls"`
+	CountWriteCalls *ebpf.Program `ebpf:"count_write_calls"`
 }
 
 func (p *counterPrograms) Close() error {
 	return _CounterClose(
+		p.CountOpenCalls,
 		p.CountReadCalls,
+		p.CountWriteCalls,
 	)
 }
 
